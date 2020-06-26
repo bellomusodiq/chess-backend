@@ -7,7 +7,7 @@ const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 
-const Game = require('./models/gametable');
+const Game = require('./models/game');
 const Player = require('./models/player');
 
 
@@ -58,11 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
-<<<<<<< HEAD
 app.use('/chess', gameRoutes);
-=======
-app.use('/game', gameRoutes);
->>>>>>> 13e16e174a9ba6a91ba6f54176ab78ce5f632e42
 app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
@@ -92,7 +88,7 @@ io.on('connection', (socket) => {
 });
 
 const PORT = 8080;
-const MONGODB_CONNECTION_STRING = 'mongodb://localhost:27017/?readPreference=primary&ssl=false/chess';
+const MONGODB_CONNECTION_STRING = 'mongodb+srv://tosin:Cy2svEQC0bAz4IDv@cluster0-hqnwm.mongodb.net/feed?retryWrites=true&w=majority';
 
 mongoose
   .connect(

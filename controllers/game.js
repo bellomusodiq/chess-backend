@@ -1,10 +1,10 @@
 // const fs = require('fs');
 // const path = require('path');
 
-// const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator/check');
 
-const Game = require('../models/post');
-const Player = require('../models/user');
+const Game = require('../models/game');
+const Player = require('../models/player');
 
 
 exports.getGames = (req, res, next) => {
@@ -15,7 +15,7 @@ exports.getGames = (req, res, next) => {
     .countDocuments() 
     .then(count => {
       totalItems = count;
-      return Post.find()
+      return Game.find()
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
     })
@@ -24,7 +24,7 @@ exports.getGames = (req, res, next) => {
         .status(200)
         .json({
           message: 'Fetched games successfully.',
-          posts: posts,
+          games: games,
           totalItems: totalItems
         });
     })
@@ -43,29 +43,26 @@ exports.createGame = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  const player1Name =  // or the name the player use for signup ?
-  const player2Name =
+  const whitePlayer = req.body.whitePlayer  
+  const blackPlayer = req.body.blackPlayer
   const game = new Game({
-    title: title,
-    content: content,
-    imageUrl: imageUrl,
-    creator: req.userId
+    whitePlayer: whitePlayer,
+    blackPlayer: blackPlayer
   });
-  post
+  game
     .save()
     .then(result => {
-      return User.findById(req.userId);
+      return Player.findById(req.playerId); //the logic to find other player to save too will be added
     })
-    .then(user => {
-      creator = user;
-      user.posts.push(post);
-      return user.save();
+    .then(player => {
+      whitePlayer = player;
+      player.games.push(game);
+      return player.save();
     })
     .then(result =>
       res.status(201).json({
-      message: 'Post created successfully!',
-      post: post,
-      creator: {_id: creator._id, name: creator.name} 
+      message: 'Game created successfully!' // plus whatever you need for F.E
+     
     })
     )
     .catch(err => {
@@ -76,16 +73,16 @@ exports.createGame = (req, res, next) => {
     });
 };
 
-exports.getPost = (req, res, next) => {
-  const postId = req.params.postId;
-  Post.findById(postId)
-    .then(post => {
-      if (!post) {
-        const error = new Error('Could not find post.');
+exports.getGame = (req, res, next) => {
+  const gameId = req.params.gameId;
+  Game.findById(gameId)
+    .then(game => {
+      if (!game) {
+        const error = new Error('Could not find game.');
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Post fetched.', post: post });
+      res.status(200).json({ message: 'Game fetched' });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -95,86 +92,86 @@ exports.getPost = (req, res, next) => {
     });
 };
 
-exports.updatePost = (req, res, next) => {
-  const postId = req.params.postId;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation failed, entered data is incorrect.');
-    error.statusCode = 422;
-    throw error;
-  }
-  const title = req.body.title;
-  const content = req.body.content;
-  let imageUrl = req.body.image;
-  if (req.file) {
-    imageUrl = req.file.path.replace('\\', '/');;
-  }
-  if (!imageUrl) {
-    const error = new Error('No file picked.');
-    error.statusCode = 422;
-    throw error;
-  }
-  Post.findById(postId)
-    .then(post => {
-      if (!post) {
-        const error = new Error('Could not find post.');
-        error.statusCode = 404;
-        throw error;
-      }
-      if(post.creator.toString() !== req.userId){
-        const error = new Error('Not Authorized');
-        error.statusCode = 403;
-        throw error;
-      }
-      if (imageUrl !== post.imageUrl) {
-        clearImage(post.imageUrl);
-      }
-      post.title = title;
-      post.imageUrl = imageUrl;
-      post.content = content;
-      return post.save();
-    })
-    .then(result => {
-      res.status(200).json({ message: 'Post updated!', post: result });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
-};
+// exports.updatePost = (req, res, next) => {
+//   const gameId = req.params.postId;
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     const error = new Error('Validation failed, entered data is incorrect.');
+//     error.statusCode = 422;
+//     throw error;
+//   }
+//   const title = req.body.title;
+//   const content = req.body.content;
+//   let imageUrl = req.body.image;
+//   if (req.file) {
+//     imageUrl = req.file.path.replace('\\', '/');;
+//   }
+//   if (!imageUrl) {
+//     const error = new Error('No file picked.');
+//     error.statusCode = 422;
+//     throw error;
+//   }
+//   Post.findById(postId)
+//     .then(post => {
+//       if (!post) {
+//         const error = new Error('Could not find post.');
+//         error.statusCode = 404;
+//         throw error;
+//       }
+//       if(post.creator.toString() !== req.userId){
+//         const error = new Error('Not Authorized');
+//         error.statusCode = 403;
+//         throw error;
+//       }
+//       if (imageUrl !== post.imageUrl) {
+//         clearImage(post.imageUrl);
+//       }
+//       post.title = title;
+//       post.imageUrl = imageUrl;
+//       post.content = content;
+//       return post.save();
+//     })
+//     .then(result => {
+//       res.status(200).json({ message: 'Post updated!', post: result });
+//     })
+//     .catch(err => {
+//       if (!err.statusCode) {
+//         err.statusCode = 500;
+//       }
+//       next(err);
+//     });
+// };
 
-exports.deletePost = (req, res, next) => {
-  const postId = req.params.postId;
-  Post.findById(postId)
-    .then(post => {
-      if (!post) {
-        const error = new Error('Could not find post.');
-        error.statusCode = 404;
-        throw error;
-      }
-      if(post.creator.toString() !== req.userId){
-        const error = new Error('Not Authorized');
-        error.statusCode = 403;
-        throw error;
-      }
-      clearImage(post.imageUrl);
-      return Post.findByIdAndRemove(postId);
-    })
-    .then(result => {
-      console.log(result);
-      res.status(200).json({ message: 'Deleted post.' });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
-};
+// exports.deletePost = (req, res, next) => {
+//   const postId = req.params.postId;
+//   Post.findById(postId)
+//     .then(post => {
+//       if (!post) {
+//         const error = new Error('Could not find post.');
+//         error.statusCode = 404;
+//         throw error;
+//       }
+//       if(post.creator.toString() !== req.userId){
+//         const error = new Error('Not Authorized');
+//         error.statusCode = 403;
+//         throw error;
+//       }
+//       clearImage(post.imageUrl);
+//       return Post.findByIdAndRemove(postId);
+//     })
+//     .then(result => {
+//       console.log(result);
+//       res.status(200).json({ message: 'Deleted post.' });
+//     })
+//     .catch(err => {
+//       if (!err.statusCode) {
+//         err.statusCode = 500;
+//       }
+//       next(err);
+//     });
+// };
 
-const clearImage = filePath => {
-  filePath = path.join(__dirname, '..', filePath);
-  fs.unlink(filePath, err => console.log(err));
-};
+// const clearImage = filePath => {
+//   filePath = path.join(__dirname, '..', filePath);
+//   fs.unlink(filePath, err => console.log(err));
+// };

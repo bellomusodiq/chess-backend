@@ -306,11 +306,11 @@ const gameSchema = new Schema({
     default: 'ongoing',
     enum: ['ongoing', 'white-wins', 'black-wins', 'draw']
   },
-  result: {
-    type: Schema.Types.ObjectId,
-    ref: Player
-    // Something like 
-  }
+  // result: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: Player  // why ?
+  //   // Something like 
+  // }
 });
 
 module.exports = mongoose.model('Game', gameSchema);

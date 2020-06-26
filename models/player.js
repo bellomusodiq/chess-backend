@@ -20,12 +20,7 @@ const playerSchema = new Schema({
   },
   rating: {
       type: Number,
-<<<<<<< HEAD
-      require: true
-=======
-      require: true,
-      default: 1200
->>>>>>> 13e16e174a9ba6a91ba6f54176ab78ce5f632e42
+      default: 120
   },
   games: [
     {
