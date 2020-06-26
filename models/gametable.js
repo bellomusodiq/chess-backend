@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Player = require('./player');
 const Schema = mongoose.Schema;
 
 const gameSchema = new Schema({
@@ -17,7 +18,8 @@ const gameSchema = new Schema({
   },
   moves: {
     type: [String],
-    required: true 
+    required: true,
+    default: []
     // still don't understand
   },
   pieces: {
@@ -307,14 +309,8 @@ const gameSchema = new Schema({
   result: {
     type: Schema.Types.ObjectId,
     ref: Player
-    // Something like this?
-  },
-  game: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Games'
-    }
-  ]
+    // Something like 
+  }
 });
 
 module.exports = mongoose.model('Game', gameSchema);

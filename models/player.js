@@ -19,8 +19,9 @@ const playerSchema = new Schema({
     default: 'I am New'
   },
   rating: {
-      type: Nu,
-      require: true
+      type: Number,
+      require: true,
+      default: 1200
   },
   games: [
     {
