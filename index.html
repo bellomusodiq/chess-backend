@@ -9,7 +9,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        console.log(socket)
+        socket.on('broadcast', e => {
+            console.log(e)
+        })
     </script>
 </body>
 </html>

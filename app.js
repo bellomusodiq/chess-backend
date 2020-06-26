@@ -1,15 +1,24 @@
-// const path = require('path');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid')
 const multer = require('multer');
+const path = require('path');
+const url = require('url');
+const querystring = require('querystring');
+
+const Game = require('./models/gametable');
+const Player = require('./models/player');
+
+
 
 const gameRoutes = require('./routes/game');
 const authRoutes = require('./routes/auth');
 
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -49,7 +58,11 @@ app.use((req, res, next) => {
   next();
 });
 
+<<<<<<< HEAD
 app.use('/chess', gameRoutes);
+=======
+app.use('/game', gameRoutes);
+>>>>>>> 13e16e174a9ba6a91ba6f54176ab78ce5f632e42
 app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
@@ -67,17 +80,28 @@ app.get('/socket-testing', (req, res) => {
 
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  const urlParts = url.parse(socket.handshake.headers.referer);
+  const user = querystring.decode(urlParts.query).user;
+  console.log(`player ${user} joined`);
   socket.on('disconnect', () => {
-      console.log('user disconnected')
+      console.log(`player ${user} disconnected`);
+  })
+  io.emit('broadcast', {
+    message: 'Hello World!'
   })
 });
 
+const PORT = 8080;
+const MONGODB_CONNECTION_STRING = 'mongodb://localhost:27017/?readPreference=primary&ssl=false/chess';
+
 mongoose
   .connect(
-    'mongodb+srv://tosin:Cy2svEQC0bAz4IDv@cluster0-hqnwm.mongodb.net/feed?retryWrites=true&w=majority'
+    MONGODB_CONNECTION_STRING,
+    {useNewUrlParser: true, useUnifiedTopology: true}
   )
   .then(result => {
-    app.listen(8080);
+    http.listen(PORT, () => {
+      console.log(`listening on *:${PORT}`);
+    });
   })
   .catch(err => console.log(err));
