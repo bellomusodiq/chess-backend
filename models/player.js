@@ -19,7 +19,7 @@ const playerSchema = new Schema({
     default: 'I am New'
   },
   rating: {
-      type: Nu,
+      type: Number,
       require: true
   },
   games: [

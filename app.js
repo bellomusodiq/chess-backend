@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid')
 const multer = require('multer');
 
-const feedRoutes = require('./routes/feed');
+const gameRoutes = require('./routes/game');
 const authRoutes = require('./routes/auth');
 
 const app = express();
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/feed', feedRoutes);
+app.use('/chess', gameRoutes);
 app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
