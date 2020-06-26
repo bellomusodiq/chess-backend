@@ -60,6 +60,19 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
+// web socket (socket.io)
+app.get('/socket-testing', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+      console.log('user disconnected')
+  })
+});
+
 mongoose
   .connect(
     'mongodb+srv://tosin:Cy2svEQC0bAz4IDv@cluster0-hqnwm.mongodb.net/feed?retryWrites=true&w=majority'

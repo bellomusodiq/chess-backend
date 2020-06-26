@@ -10,14 +10,20 @@ const gameSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: Player
   },
-  moves: {
+  turn: {
     type: String,
+    default: 'W',
+    required: true
+  },
+  moves: {
+    type: [String],
     required: true 
     // still don't understand
   },
   status: {
     type: String,
-    default: 'I am New'
+    default: 'ongoing',
+    enum: ['ongoing', 'white-wins', 'black-wins', 'draw']
   },
   result: {
     type: Schema.Types.ObjectId,
