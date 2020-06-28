@@ -9,11 +9,12 @@ const querystring = require('querystring');
 
 const Game = require('./models/gametable');
 const Player = require('./models/player');
-
+const socketconnection = require('./sockets');
 
 
 const gameRoutes = require('./routes/game');
 const authRoutes = require('./routes/auth');
+const socketConnection = require('./sockets');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -74,18 +75,7 @@ app.get('/socket-testing', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-
-io.on('connection', (socket) => {
-  const urlParts = url.parse(socket.handshake.headers.referer);
-  const user = querystring.decode(urlParts.query).user;
-  console.log(`player ${user} joined`);
-  socket.on('disconnect', () => {
-      console.log(`player ${user} disconnected`);
-  })
-  io.emit('broadcast', {
-    message: 'Hello World!'
-  })
-});
+socketConnection(io);
 
 const PORT = 8080;
 const MONGODB_CONNECTION_STRING = 'mongodb://localhost:27017/?readPreference=primary&ssl=false/chess';
