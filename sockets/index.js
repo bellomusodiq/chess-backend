@@ -1,7 +1,7 @@
 const url = require('url');
 const querystring = require('querystring');
 
-const Game = require('../models/gametable');
+const Game = require('../models/game');
 
 
 class GameSocket {
