@@ -8,26 +8,18 @@ class GameSocket {
     static listen(socket, io, playerId) {
         socket.on('game_room', (data) => {
             console.log(data)
-            // io.emit('game_room', data)
-            // send game invite
-
-            // join game via link
-
-            // game play
-
-            // data = {newGame: true/false, }
-            //     if (data.newGame) {
-            // Game.updateOne({ _id: gameId }, { $set: { pieces: data.pieces } })
-            //     .then(game => {
-            //         Game.findById(gameId)
-            //             .exec()
-            //             .then(gameObj => {
-            //                 io.emit('game_room', { status: 200, message: gameObj.populate() })
-            //             })
-            //     })
-            //     .catch(err => {
-            //         io.emit('game_room', { status: 404, message: 'game not found' })
-            //     })
+           
+            Game.updateOne({ _id: gameId }, { $set: { pieces: data.pieces } })
+                .then(game => {
+                    Game.findById(gameId)
+                        .exec()
+                        .then(gameObj => {
+                            io.emit('game_room', { status: 200, message: gameObj.populate() })
+                        })
+                })
+                .catch(err => {
+                    io.emit('game_room', { status: 404, message: 'game not found' })
+                })
         })
     }
 }
